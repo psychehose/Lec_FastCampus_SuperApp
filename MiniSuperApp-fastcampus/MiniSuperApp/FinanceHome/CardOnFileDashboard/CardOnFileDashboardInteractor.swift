@@ -14,7 +14,8 @@ protocol CardOnFileDashboardRouting: ViewableRouting {
 
 protocol CardOnFileDashboardPresentable: Presentable {
   var listener: CardOnFileDashboardPresentableListener? { get set }
-  // TODO: Declare methods the interactor can invoke the presenter to present data.
+
+  func update(with viewModels: [PaymentMethodViewModel])
 }
 
 protocol CardOnFileDashboardListener: AnyObject {
@@ -52,11 +53,14 @@ final class CardOnFileDashboardInteractor: PresentableInteractor<CardOnFileDashb
     super.didBecomeActive()
     dependency.cardsOnFileRepository.cardOnFile.sink { methods in
       // paymentMethod(디코더블) Array를 뷰가 바로 쓸 수 있는 viewModel로 전환해버리기
+      let viewModels = methods.prefix(5).map(PaymentMethodViewModel.init)
+      self.presenter.update(with: viewModels)
     }.store(in: &cancellables)
   }
   
   override func willResignActive() {
     super.willResignActive()
-    // TODO: Pause any business logic.
+    cancellables.forEach { $0.cancel() }
+    cancellables.removeAll()
   }
 }

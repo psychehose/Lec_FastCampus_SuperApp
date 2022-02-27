@@ -9,14 +9,17 @@ final class FinanceHomeComponent:
   Component<FinanceHomeDependency>,
   SuperPayDashboardDependency,
   CardOnFileDashboardDependency {
-
+  
+  let cardOnfFileRepository: CardOnFileRepository
   var balance: ReadOnlyCurrentValuePublisher<Double> { balancePublisher }
   private let balancePublisher: CurrentValuePublisher<Double>
   
   init(
     dependency: FinanceHomeDependency,
-    balance: CurrentValuePublisher<Double>
+    balance: CurrentValuePublisher<Double>,
+    cardOnFileRepository: CardOnFileRepository
   ) {
+    self.cardOnfFileRepository = cardOnFileRepository
     self.balancePublisher = balance
     super.init(dependency: dependency)
   }
@@ -39,7 +42,8 @@ final class FinanceHomeBuilder: Builder<FinanceHomeDependency>, FinanceHomeBuild
     
     let component = FinanceHomeComponent(
       dependency: dependency,
-      balance: balancePublisher
+      balance: balancePublisher,
+      cardOnFileRepository: CardOnFileRepositoryImp()
     )
     let viewController = FinanceHomeViewController()
     let interactor = FinanceHomeInteractor(presenter: viewController)
